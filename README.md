@@ -36,11 +36,11 @@ We need 2 Lambda functions, one to handle API Requests, and one to handle matchi
 
 #### API Handler
 Here we don't need to do anything special except enable the trigger from API Gateway, and change our URLs for SQS and Dynamo.  
-The code for this function is provided as `DNAtoProteinAPIHandler\lambda_function.py`.
+The code for this function is provided as `DNAtoProteinAPIHandler/lambda_function.py`.
 
 #### Matcher
 First we need to add a `biopython` layer. I believe AWS provides a `numpy` layer, (at least they did for me), but if not, we need a layer for that as well, because it is a dependency. This is best explained in [this link](https://medium.com/swlh/how-to-add-python-pandas-layer-to-aws-lambda-bab5ea7ced4f).  
-The code for this lambda is provided as `DNAtoProteinMatcher\lambda_function.py`
+The code for this lambda is provided as `DNAtoProteinMatcher/lambda_function.py`
 Then, lets add a trigger from SQS, with a batch size of 1, so we get 1 function invocation per request.  
 Then we need to again change our URLs for Dynamo and S3.  
 Additionally we may want to adjust our timeout period to a bit longer (I set mine to 10 minutes, but for this example likely 2 minutes is fine). Lambda assigns compute power based on memory, so it is possible to make this matcher faster, with a lower timeout, as I left mine on the smallest max memory limit, 128MB. 

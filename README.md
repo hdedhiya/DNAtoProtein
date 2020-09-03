@@ -1,6 +1,8 @@
 # DNAtoProtein
 Serverless AWS-based webapp that searches genomes for the corresponding protein to DNA queries.
 
+[http://dna-to-protein-frontend.s3-website.us-east-2.amazonaws.com/](http://dna-to-protein-frontend.s3-website.us-east-2.amazonaws.com/)
+
 ## Overall architecture
 ![flowchart](flow_diagram.png)
 

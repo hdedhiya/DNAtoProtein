@@ -56,4 +56,4 @@ Additionally we may want to adjust our timeout period to a bit longer (I set min
 1. As serverless as possible, so we only pay for what we use.
 2. Cloud-based so could easily be expanded to multiple regions with low latency.
 3. Easily handles multiple users and concurrent users.
-4. CI/CD are naturally provided in the AWS environment as CodeCommit, CodeBuild, and CodeDeploy.
+4. CI/CD are naturally provided in the AWS environment as CodeCommit, and CodePipeline.

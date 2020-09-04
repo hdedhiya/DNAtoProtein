@@ -1,0 +1,282 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Resources": {
+        "tableDNAtoProtein": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+                "AttributeDefinitions": [
+                    {
+                        "AttributeName": "id",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "userIP",
+                        "AttributeType": "S"
+                    }
+                ],
+                "KeySchema": [
+                    {
+                        "AttributeName": "userIP",
+                        "KeyType": "HASH"
+                    },
+                    {
+                        "AttributeName": "id",
+                        "KeyType": "RANGE"
+                    }
+                ],
+                "ProvisionedThroughput": {
+                    "ReadCapacityUnits": "5",
+                    "WriteCapacityUnits": "5"
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "2ac64977-b165-4107-8f19-8224e9b65a99"
+                }
+            }
+        },
+        "s3dnatoproteinbucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "AccessControl": "Private",
+                "VersioningConfiguration": {
+                    "Status": "Suspended"
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "85bac2c5-4f55-4a1d-af4d-285782b2b75e"
+                }
+            }
+        },
+        "s3dnatoproteinfrontend": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "WebsiteConfiguration": {
+                    "IndexDocument": "index.html"
+                },
+                "AccessControl": "Private",
+                "VersioningConfiguration": {
+                    "Status": "Suspended"
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "4c6baf55-79d7-4524-b38b-3d5ea9ea2a40"
+                }
+            }
+        },
+        "queueDNAtoProteinQueue": {
+            "Type": "AWS::SQS::Queue",
+            "Properties": {
+                "DelaySeconds": "0",
+                "MaximumMessageSize": "262144",
+                "MessageRetentionPeriod": "345600",
+                "ReceiveMessageWaitTimeSeconds": "0",
+                "VisibilityTimeout": "900"
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "aa14b4ed-b34a-4e3b-a159-fd0068d70529"
+                }
+            }
+        },
+        "sqspolicyDNAtoProteinQueue": {
+            "Type": "AWS::SQS::QueuePolicy",
+            "Properties": {
+                "Queues": [
+                    {
+                        "Ref": "queueDNAtoProteinQueue"
+                    }
+                ],
+                "PolicyDocument": {
+                    "Version": "2008-10-17",
+                    "Id": "__default_policy_ID",
+                    "Statement": [
+                        {
+                            "Sid": "__owner_statement",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "AWS": "arn:aws:iam::956452502284:root"
+                            },
+                            "Action": "SQS:*",
+                            "Resource": {
+                                "Fn::GetAtt": [
+                                    "queueDNAtoProteinQueue",
+                                    "Arn"
+                                ]
+                            }
+                        },
+                        {
+                            "Sid": "__sender_statement",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "AWS": "arn:aws:iam::956452502284:role/LambdaDynamoCloudwatch"
+                            },
+                            "Action": "SQS:SendMessage",
+                            "Resource": {
+                                "Fn::GetAtt": [
+                                    "queueDNAtoProteinQueue",
+                                    "Arn"
+                                ]
+                            }
+                        },
+                        {
+                            "Sid": "__receiver_statement",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "AWS": "arn:aws:iam::956452502284:role/LambdaDynamoCloudwatch"
+                            },
+                            "Action": [
+                                "SQS:ChangeMessageVisibility",
+                                "SQS:DeleteMessage",
+                                "SQS:ReceiveMessage"
+                            ],
+                            "Resource": {
+                                "Fn::GetAtt": [
+                                    "queueDNAtoProteinQueue",
+                                    "Arn"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "1a3f3ebd-5ce4-4c99-9681-da6d5b651be9"
+                }
+            }
+        },
+        "API": {
+            "Type": "AWS::ApiGatewayV2::Api",
+            "Properties": {},
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "d68d6673-3f5b-4613-acc0-d2c6c8976f12"
+                }
+            }
+        },
+        "APIHandler": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {},
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "d603b69e-e189-403c-bea0-5b565a7b561d"
+                }
+            }
+        },
+        "Matcher": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {},
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "4984dafd-73f6-4f35-973c-64937d9ee5be"
+                }
+            }
+        }
+    },
+    "Description": "DNAtoProtein template",
+    "Metadata": {
+        "AWS::CloudFormation::Designer": {
+            "aa14b4ed-b34a-4e3b-a159-fd0068d70529": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 60,
+                    "y": 90
+                },
+                "z": 1,
+                "embeds": []
+            },
+            "1a3f3ebd-5ce4-4c99-9681-da6d5b651be9": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 180,
+                    "y": 90
+                },
+                "z": 1,
+                "embeds": [],
+                "isassociatedwith": [
+                    "aa14b4ed-b34a-4e3b-a159-fd0068d70529"
+                ]
+            },
+            "4c6baf55-79d7-4524-b38b-3d5ea9ea2a40": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": -140,
+                    "y": 140
+                },
+                "z": 1,
+                "embeds": []
+            },
+            "85bac2c5-4f55-4a1d-af4d-285782b2b75e": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 180,
+                    "y": 210
+                },
+                "z": 1,
+                "embeds": []
+            },
+            "2ac64977-b165-4107-8f19-8224e9b65a99": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 300,
+                    "y": 90
+                },
+                "z": 1,
+                "embeds": []
+            },
+            "d68d6673-3f5b-4613-acc0-d2c6c8976f12": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": -50,
+                    "y": 140
+                },
+                "z": 0,
+                "embeds": []
+            },
+            "d603b69e-e189-403c-bea0-5b565a7b561d": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 60,
+                    "y": 180
+                },
+                "z": 0,
+                "embeds": []
+            },
+            "4984dafd-73f6-4f35-973c-64937d9ee5be": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": -13.97167258637349,
+                    "y": 240.12187850688525
+                },
+                "z": 0
+            }
+        }
+    }
+}
